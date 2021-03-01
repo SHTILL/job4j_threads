@@ -1,8 +1,11 @@
 package ru.job4j.synchronization;
 
+import net.jcip.annotations.ThreadSafe;
+
 import java.io.*;
 import java.util.stream.Collectors;
 
+@ThreadSafe
 public class ParseFile {
     private final File file;
 
