@@ -3,10 +3,10 @@ package ru.job4j.concurrent;
 public class ConsoleProgress implements Runnable {
     @Override
     public void run() {
-        final char[] progress = { '\\', '|', '/', '-' };
+        final char[] progress = {'\\', '|', '/', '-'};
         int i = 0;
         while (!Thread.currentThread().isInterrupted()) {
-            System.out.print("\r load: " + progress[i%progress.length]);
+            System.out.print("\r load: " + progress[i % progress.length]);
             i++;
             try {
                 Thread.sleep(500);
@@ -25,7 +25,7 @@ public class ConsoleProgress implements Runnable {
             e.printStackTrace();
         }
         t1.interrupt();
-        System.out.println( "");
+        System.out.println("");
         System.out.print("Finish");
     }
 }
