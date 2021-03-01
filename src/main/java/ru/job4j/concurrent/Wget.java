@@ -1,22 +1,54 @@
 package ru.job4j.concurrent;
 
-public class Wget {
-    public static void main(String[] args) {
-        Thread thread = new Thread(
-                () -> {
+import java.io.BufferedInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+
+public class Wget implements Runnable {
+    private final static char[] PROGRESS = {'\\', '|', '/', '-'};
+
+    private final String url;
+    private final int speed;
+
+    public Wget(String url, int speed) {
+        this.url = url;
+        this.speed = speed;
+    }
+
+    @Override
+    public void run() {
+        System.out.println("Start downloading");
+        try (BufferedInputStream in = new BufferedInputStream(new URL(url).openStream());
+             FileOutputStream fileOutputStream = new FileOutputStream("pom_tmp.xml")) {
+                long timeStartLoading = System.currentTimeMillis();
+                byte[] dataBuffer = new byte[1024];
+                int bytesRead;
+                while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+                    fileOutputStream.write(dataBuffer, 0, bytesRead);
+                }
+                long tookTime = System.currentTimeMillis() - timeStartLoading;
+                if (tookTime < speed) {
                     try {
-                        for (int i = 0; i <= 100; i++) {
-                            System.out.print("\rLoading : " + i + "%");
-                            Thread.sleep(1000);
-                        }
+                        Thread.sleep(speed - tookTime);
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        Thread.currentThread().interrupt();
                     }
                 }
-        );
-        thread.start();
-        while (thread.getState() != Thread.State.TERMINATED);
-        System.out.println("");
-        System.out.println("Finished");
+        } catch (IOException e) {
+            System.out.print("Downloading failed");
+            return;
+        }
+        System.out.println("Finish downloading");
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        String url = args[0];
+        int speed = Integer.parseInt(args[1]);
+        Thread wget = new Thread(new Wget(url, speed));
+        wget.start();
+        wget.join();
     }
 }
