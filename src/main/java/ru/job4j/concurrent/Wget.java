@@ -3,13 +3,9 @@ package ru.job4j.concurrent;
 import java.io.BufferedInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 
 public class Wget implements Runnable {
-    private final static char[] PROGRESS = {'\\', '|', '/', '-'};
-
     private final String url;
     private final int speed;
 
@@ -20,27 +16,33 @@ public class Wget implements Runnable {
 
     @Override
     public void run() {
+        int timeMsPerKb = 1000 / speed;
+
         System.out.println("Start downloading");
         try (BufferedInputStream in = new BufferedInputStream(new URL(url).openStream());
              FileOutputStream fileOutputStream = new FileOutputStream("pom_tmp.xml")) {
+
+            byte[] dataBuffer = new byte[1024];
+            int bytesRead;
+
+            do {
                 long timeStartLoading = System.currentTimeMillis();
-                byte[] dataBuffer = new byte[1024];
-                int bytesRead;
-                while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
-                    fileOutputStream.write(dataBuffer, 0, bytesRead);
-                }
+                bytesRead = in.read(dataBuffer, 0, 1024);
+                fileOutputStream.write(dataBuffer, 0, Math.max(bytesRead, 0));
                 long tookTime = System.currentTimeMillis() - timeStartLoading;
-                if (tookTime < speed) {
+                if (tookTime < timeMsPerKb) {
                     try {
-                        Thread.sleep(speed - tookTime);
+                        Thread.sleep(timeMsPerKb - tookTime);
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                     }
                 }
+            } while (bytesRead != -1);
         } catch (IOException e) {
             System.out.print("Downloading failed");
             return;
         }
+        System.out.println();
         System.out.println("Finish downloading");
     }
 
