@@ -3,36 +3,43 @@ package ru.job4j.synchronization;
 import net.jcip.annotations.GuardedBy;
 import net.jcip.annotations.ThreadSafe;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @ThreadSafe
 public class UserStorage {
-    final Map<Integer, User> store = new ConcurrentHashMap<>();
+    @GuardedBy("this")
+    private final Map<Integer, User> store = new HashMap<>();
 
-    @GuardedBy(value = "store")
-    boolean add(User user) {
-        store.put(user.id, user);
+    synchronized boolean add(User user) {
+        store.putIfAbsent(user.id, user);
         return true;
     }
 
-    @GuardedBy(value = "store")
-    boolean update(User user) {
-        store.put(user.id, user);
+    synchronized boolean update(User user) {
+        store.replace(user.id, user);
         return true;
     }
 
-    @GuardedBy(value = "store")
-    boolean delete(User user) {
+    synchronized boolean delete(User user) {
         store.remove(user.id);
         return true;
     }
 
-    @GuardedBy("this")
-    synchronized void transfer(int fromId, int toId, int amount) {
+    synchronized boolean transfer(int fromId, int toId, int amount) {
         User from = store.get(fromId);
+        if (from == null) {
+            return false;
+        }
         User to   = store.get(toId);
+        if (to == null) {
+            return false;
+        }
+        if (from.getAmount() < amount) {
+            return false;
+        }
         from.setAmount(from.getAmount() - amount);
         to.setAmount(to.getAmount() + amount);
+        return true;
     }
 }
