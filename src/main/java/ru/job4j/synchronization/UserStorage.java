@@ -12,18 +12,24 @@ public class UserStorage {
     private final Map<Integer, User> store = new HashMap<>();
 
     synchronized boolean add(User user) {
-        store.putIfAbsent(user.id, user);
-        return true;
+        if (user == null) {
+            return false;
+        }
+        return (store.putIfAbsent(user.id, user) == null);
     }
 
     synchronized boolean update(User user) {
-        store.replace(user.id, user);
-        return true;
+        if (user == null) {
+            return false;
+        }
+        return (store.replace(user.id, user) != null);
     }
 
     synchronized boolean delete(User user) {
-        store.remove(user.id);
-        return true;
+        if (user == null) {
+            return false;
+        }
+        return (store.remove(user.id) != null);
     }
 
     synchronized boolean transfer(int fromId, int toId, int amount) {
