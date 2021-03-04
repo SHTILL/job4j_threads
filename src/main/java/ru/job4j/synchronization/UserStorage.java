@@ -34,14 +34,8 @@ public class UserStorage {
 
     synchronized boolean transfer(int fromId, int toId, int amount) {
         User from = store.get(fromId);
-        if (from == null) {
-            return false;
-        }
         User to   = store.get(toId);
-        if (to == null) {
-            return false;
-        }
-        if (from.getAmount() < amount) {
+        if ((to == null) || (from == null) || (from.getAmount() < amount)) {
             return false;
         }
         from.setAmount(from.getAmount() - amount);
