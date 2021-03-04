@@ -9,27 +9,23 @@ public class SimpleBlockingQueue<T> {
     @GuardedBy("this")
     private Queue<T> queue = new LinkedList<>();
 
-    synchronized public void offer(T value) {
+    synchronized public void offer(T value) throws InterruptedException {
         while (!queue.offer(value)) {
-            try {
-                this.wait();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+            this.wait();
         }
         this.notifyAll();
     }
 
-    synchronized public T poll() {
+    synchronized public T poll() throws InterruptedException {
         T item;
         while ((item = queue.poll()) == null) {
-            try {
-                this.wait();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+            this.wait();
         }
         this.notifyAll();
         return item;
+    }
+
+    synchronized boolean isEmpty() {
+        return queue.isEmpty();
     }
 }
