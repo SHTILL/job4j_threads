@@ -2,14 +2,13 @@ package ru.job4j.interaction;
 
 public class ParallelSearch {
     public static void main(String[] args) {
-        SimpleBlockingQueue<Integer> queue = new SimpleBlockingQueue<Integer>();
+        SimpleBlockingQueue<Integer> queue = new SimpleBlockingQueue<>();
         final Thread consumer = new Thread(
                 () -> {
-                    while (true) {
+                    while (!Thread.currentThread().isInterrupted()) {
                         try {
                             System.out.println(queue.poll());
                         } catch (InterruptedException e) {
-                            e.printStackTrace();
                             Thread.currentThread().interrupt();
                         }
                     }
@@ -23,12 +22,10 @@ public class ParallelSearch {
                             queue.offer(index);
                             Thread.sleep(500);
                         } catch (InterruptedException e) {
-                            e.printStackTrace();
                             Thread.currentThread().interrupt();
                         }
                     }
                 }
-
         );
 
         producer.start();
@@ -37,6 +34,11 @@ public class ParallelSearch {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        consumer.stop();
+        consumer.interrupt();
+        try {
+            consumer.join();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 }
