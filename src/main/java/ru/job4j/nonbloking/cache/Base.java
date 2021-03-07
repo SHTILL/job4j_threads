@@ -5,18 +5,16 @@ import net.jcip.annotations.ThreadSafe;
 
 @ThreadSafe
 public class Base {
-    @GuardedBy("this")
     private final int id;
     private int version;
     private String name;
 
-    public Base(int id, int version, String name) {
+    public Base(int id, String name) {
         this.id = id;
-        this.version = version;
         this.name = name;
     }
 
-    synchronized public int getId() {
+    public int getId() {
         return id;
     }
 
