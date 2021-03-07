@@ -13,7 +13,7 @@ public class Main {
         user1.setName("User 1");
 
         Base user2 = map.get(base.getId());
-        user1.setName("User 2");
+        user2.setName("User 2");
 
         map.put(user1.getId(), user1);
         map.put(user2.getId(), user2);

@@ -7,11 +7,19 @@ import static org.junit.Assert.*;
 
 public class CacheTest {
     @Test
-    public void whenAdded() {
+    public void whenAddedSucceed() {
         Cache c = new Cache();
         Base b = new Base(1, 0, "Origin");
         assertTrue(c.add(b));
         assertThat("Origin", is(c.get(1).getName()));
+    }
+
+    @Test
+    public void whenAddedFailed() {
+        Cache c = new Cache();
+        Base b = new Base(1, 0, "Origin");
+        assertTrue(c.add(b));
+        assertFalse(c.add(b));
     }
 
     @Test
@@ -24,29 +32,43 @@ public class CacheTest {
     }
 
     @Test
-    public void whenUpdated() {
+    public void whenUpdateSucceed() {
         Cache c = new Cache();
         Base b = new Base(1, 0, "Origin");
         assertTrue(c.add(b));
-        Base copy1 = c.get(1);
-        copy1 = copy1.setName("Copy1");
-        c.update(copy1);
-        Base copy2 = c.get(1);
-        copy2 = copy2.setName("Copy2");
-        c.update(copy2);
-        assertThat("Copy2", is(c.get(1).getName()));
+        b.setName("New value");
+        assertTrue(c.update(b));
+        assertThat("New value", is(c.get(1).getName()));
     }
 
-    @Test(expected = OptimisticException.class)
-    public void whenUpdatedOptimistic() {
+    @Test
+    public void whenUpdateNotAdded() {
+        Cache c = new Cache();
+        Base b = new Base(1, 0, "Origin");
+        assertFalse(c.update(b));
+    }
+
+    @Test
+    public void whenUpdateDeleted() {
+        Cache c = new Cache();
+        Base b = new Base(1, 0, "Origin");
+        assertTrue(c.add(b));
+        assertTrue(c.update(b));
+        assertTrue(c.delete(b));
+        assertFalse(c.update(b));
+    }
+
+    @Test
+    public void whenUpdateLastWins() {
         Cache c = new Cache();
         Base b = new Base(1, 0, "Origin");
         assertTrue(c.add(b));
         Base copy1 = c.get(1);
+        copy1.setName("Copy1");
         Base copy2 = c.get(1);
-        copy1 = copy1.setName("Copy1");
-        c.update(copy1);
-        copy2 = copy2.setName("Copy2");
-        c.update(copy2);
+        copy2.setName("Copy2");
+        assertTrue(c.update(copy1));
+        assertTrue(c.update(copy2));
+        assertThat("Copy2", is(c.get(1).getName()));
     }
 }

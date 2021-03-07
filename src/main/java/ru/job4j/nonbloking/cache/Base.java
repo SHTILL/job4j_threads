@@ -1,9 +1,14 @@
 package ru.job4j.nonbloking.cache;
 
+import net.jcip.annotations.GuardedBy;
+import net.jcip.annotations.ThreadSafe;
+
+@ThreadSafe
 public class Base {
+    @GuardedBy("this")
     private final int id;
-    private final int version;
-    private final String name;
+    private int version;
+    private String name;
 
     public Base(int id, int version, String name) {
         this.id = id;
@@ -11,7 +16,7 @@ public class Base {
         this.name = name;
     }
 
-    public int getId() {
+    synchronized public int getId() {
         return id;
     }
 
@@ -19,15 +24,15 @@ public class Base {
         return version;
     }
 
-    public Base setVersion(int version) {
-        return new Base(this.id, version, this.name);
+    synchronized public void increaseVersion() {
+        this.version++;
     }
 
     public String getName() {
         return name;
     }
 
-    public Base setName(String name) {
-        return new Base(this.id, this.version, name);
+    public void setName(String name) {
+        this.name = name;
     }
 }
