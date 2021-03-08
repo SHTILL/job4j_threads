@@ -1,9 +1,5 @@
 package ru.job4j.nonbloking.cache;
 
-import net.jcip.annotations.GuardedBy;
-import net.jcip.annotations.ThreadSafe;
-
-@ThreadSafe
 public class Base {
     private final int id;
     private int version;
@@ -22,7 +18,7 @@ public class Base {
         return version;
     }
 
-    synchronized public void increaseVersion() {
+    public void increaseVersion() {
         this.version++;
     }
 

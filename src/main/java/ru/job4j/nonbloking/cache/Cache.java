@@ -24,8 +24,10 @@ public class Cache {
             if (stored.getVersion() != model.getVersion()) {
                 throw new OptimisticException("Versions are not equal");
             }
-            model.increaseVersion();
         } while (memory.replace(model.getId(), model) != stored);
+        memory.computeIfPresent(model.getId(), (id, m) -> {
+            m.increaseVersion(); return m;
+        });
         return true;
     }
 
