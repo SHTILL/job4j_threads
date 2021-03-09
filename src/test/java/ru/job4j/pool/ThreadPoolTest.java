@@ -36,17 +36,20 @@ public class ThreadPoolTest {
     @Test
     public void whenHaveToWork() {
         final int workNum = 4;
+        final int timeOut = 500;
         ThreadPool pool = new ThreadPool();
         Runnable[] tasks = new Runnable[workNum];
         AtomicInteger count = new AtomicInteger(0);
         for (int i = 0; i < workNum; i++) {
-            tasks[i] = new MyTask("Task" + i, count, 500);
+            tasks[i] = new MyTask("Task" + i, count, timeOut);
         }
         for (Runnable t : tasks) {
             pool.work(t);
         }
-        while (pool.hasOngoingTasks()) {
-            int i; // dummy
+        try {
+            Thread.sleep((workNum + 1) * timeOut);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
         assertEquals(workNum, count.get());
     }
