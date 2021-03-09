@@ -8,10 +8,10 @@ import java.util.concurrent.RecursiveTask;
 
 public class ParallelIndexSearch<T> extends RecursiveTask<int[]> {
     private static final int COMPUTE_SEQ_SIZE = 10;
-    private T[] array;
-    private T value;
-    private int from;
-    private int to;
+    private final T[] array;
+    private final T value;
+    private final int from;
+    private final int to;
 
     public ParallelIndexSearch(T[] array, T value, int from, int to) {
         this.array = array;

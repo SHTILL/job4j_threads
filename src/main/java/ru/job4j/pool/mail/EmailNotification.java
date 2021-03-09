@@ -3,7 +3,7 @@ package ru.job4j.pool.mail;
 import java.util.concurrent.*;
 
 public class EmailNotification {
-    ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+    private final ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     private void send(String subject, String body, String email) {
         System.out.println("Sending email ...");
