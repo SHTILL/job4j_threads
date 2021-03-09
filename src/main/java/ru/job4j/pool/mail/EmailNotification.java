@@ -5,7 +5,7 @@ import java.util.concurrent.*;
 public class EmailNotification {
     ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-    public void send(String subject, String body, String email) {
+    private void send(String subject, String body, String email) {
         System.out.println("Sending email ...");
         try {
             Thread.sleep(1000);
